@@ -1,3 +1,4 @@
+import 'package:chatfirebase/model/USER.dart';
 import 'package:chatfirebase/shared/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +7,8 @@ import 'Components/ContectTile.dart';
 import 'package:chatfirebase/Screens/ChatRoom/Components/SendingBox.dart';
 
 class ChatRoom extends StatelessWidget {
+  final USER user;
+  ChatRoom({this.user});
   @override
   Widget build(BuildContext context) {
     return Scaffold(

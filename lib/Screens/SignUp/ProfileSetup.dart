@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:chatfirebase/Screens/HomeChats/HomeChats.dart';
+import 'package:chatfirebase/Services/DataServer.dart';
 import 'package:chatfirebase/Services/MediaService.dart';
 import 'package:chatfirebase/Services/auth.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +10,13 @@ import 'package:chatfirebase/shared/constant.dart';
 import 'package:get/get.dart';
 
 class ProfileSetup extends StatelessWidget {
-  Rx<String> name=''.obs;
-  Rx<File> image;   
-  Rx< MediaService> media=MediaService().obs;
-  final Auth  auth=Get.find<Auth>();
+  final TextEditingController name = TextEditingController();
+  final TextEditingController imageUrl = TextEditingController();
+
+  File image = null;
+  MediaService media = MediaService();
+  final Auth auth = Get.find<Auth>();
+  final DataServer db = Get.find<DataServer>();
 
   @override
   Widget build(BuildContext context) {
@@ -23,18 +27,28 @@ class ProfileSetup extends StatelessWidget {
             image: DecorationImage(
                 image: AssetImage("images/profilSetup.jpg"),
                 fit: BoxFit.cover)),
-        child:Obx(()=> SetUpProfileWidgets(
-       //   image:media.value.image,
-          setNameCallBack: (val){name.value=val;},
-          onSubmeted: (){
-            print("ss");
-           //f print(name.value+"ss");
-         //   print(media.value.image.path);
-         //   await auth.updateUserProfile("remas","st");
-           // Get.to(()=>HomeChats());
-            },
-          changeImageCallBack:()async{ await media.value.getImageFromGallery();},
-        )),
+        child: SetUpProfileWidgets(
+          image: image,
+          setNameCallBack: (val) {
+            name.text = val;
+          },
+          onSubmeted: () async {
+            print(name.text);
+            print(imageUrl.text);
+            await auth.updateUserProfile(name.text,imageUrl.text);
+            var a = await db.getAllUsers();
+            print(a.length);
+            Get.snackbar("Error ", "Somthing Wrong Happened ",
+                duration: Duration(seconds: 2));
+
+            print(a[0].id);
+            Get.to(() => HomeChats());
+          },
+          changeImageCallBack: () async {
+            image = await media.getImageFromGallery();
+             imageUrl.text = await db.uploadImageToFirebase(image);
+          },
+        ),
       ),
     );
   }
@@ -45,10 +59,13 @@ class SetUpProfileWidgets extends StatelessWidget {
   final Function setNameCallBack;
   final Function onSubmeted;
   final File image;
-  SetUpProfileWidgets({this.changeImageCallBack,this.setNameCallBack,this.image,this.onSubmeted});
+  SetUpProfileWidgets(
+      {this.changeImageCallBack,
+      this.setNameCallBack,
+      this.image,
+      this.onSubmeted});
   @override
   Widget build(BuildContext context) {
-    
     return Stack(children: [
       BlurContainer(
           blurStrength: 2,
@@ -70,8 +87,7 @@ class SetUpProfileWidgets extends StatelessWidget {
                       icon: Icon(Icons.image_outlined,
                           size: 16, color: primaryColor),
                       label: Text("Edit Display Image",
-                          style: TextStyle(
-                              color: primaryColor, fontSize: 16))),
+                          style: TextStyle(color: primaryColor, fontSize: 16))),
                   Spacer(),
                   Container(
                       decoration: BoxDecoration(
@@ -80,29 +96,29 @@ class SetUpProfileWidgets extends StatelessWidget {
                       ),
                       child: TextField(
                         decoration: InputDecoration(
-                          contentPadding:
-                              EdgeInsets.symmetric(horizontal: 8),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8),
                           hintText: "Enter Display Name",
-                          hintStyle: TextStyle(
-                              color: Colors.grey, letterSpacing: 1.1),
+                          hintStyle:
+                              TextStyle(color: Colors.grey, letterSpacing: 1.1),
                           border: InputBorder.none,
                         ),
-                        onSubmitted: setNameCallBack,
+                        onChanged: setNameCallBack,
                       )),
                   Spacer(flex: 2),
                   ElevatedButton(
                       child: Center(
                           child: Text("All Set!",
-                              style: TextStyle(color: Colors.white,fontSize: 18))),
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 18))),
                       onPressed: onSubmeted,
                       style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              primaryColor),
-                          shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(18))))),
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(primaryColor),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(18))))),
                   Spacer(flex: 2),
                 ],
               ))),
@@ -110,7 +126,7 @@ class SetUpProfileWidgets extends StatelessWidget {
           top: SizeConfig.blockSizeVertical * 25,
           left: SizeConfig.blockSizeHorizontal * 50 - 45,
           child: InkWell(
-                      child: Container(
+            child: Container(
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
@@ -121,9 +137,13 @@ class SetUpProfileWidgets extends StatelessWidget {
               ),
               child: CircleAvatar(
                 radius: 45,
-                foregroundImage:image !=null? Image.file(image ).image:null,
+                foregroundImage: image != null ? Image.file(image).image : null,
                 backgroundColor: Colors.white70,
-                child: image==null?Center(child:Icon(Icons.person_outline,size:40,color:Colors.grey)):null,
+                child: image == null
+                    ? Center(
+                        child: Icon(Icons.person_outline,
+                            size: 40, color: Colors.grey))
+                    : null,
               ),
             ),
             onTap: changeImageCallBack,

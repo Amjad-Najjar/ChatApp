@@ -7,13 +7,15 @@ import 'package:chatfirebase/shared/constant.dart';
 import 'package:get/get.dart';
 
 class SignUp extends StatelessWidget {
-  Rx<String> email = "".obs;
-  Rx<String> password = "".obs;
+  final TextEditingController email = TextEditingController();
+  final TextEditingController password = TextEditingController();
+
+  Rx<bool> verfiyState = false.obs;
+
   @override
   Widget build(BuildContext context) {
     Auth auth = Get.find<Auth>();
     SizeConfig.init(context);
-    Rx<bool> verfiyState = false.obs;
 
     return Scaffold(
         body: Container(
@@ -30,24 +32,30 @@ class SignUp extends StatelessWidget {
                 child: Obx(() => !verfiyState.value
                     ? SignUpWidgets(
                         text: "Your Email",
-                        buttonText: "Get OTP",
+                        buttonText: "Next",
                         onChangedTextFiled: (val) {
-                          return email.value = val;
+                          email.text = val;
+                        
                         },
                         onSubmeted: () {
+                          if (email.text == "") email.text = "user6@user.com";
+
                           verfiyState.value = true;
                         },
                       )
-                    : SignUpWidgets(
-                        text: "Your 6 Digits OTP",
-                        buttonText: "Verrify",
+                    :  SignUpWidgets(
+                        text: "Password",
+                        buttonText: "Next",
                         onChangedTextFiled: (val) {
-                          password.value = val;
+                          password.text = val;
                         },
                         onSubmeted: () async {
-                          await auth.signUpWithEmail(
-                              email.value, password.value);
-                              Get.to(()=>ProfileSetup());
+                          if (password.text == "")
+                            password.text = "user6@users";
+
+                          print(email.text + " " + password.text);
+                          await auth.signUpWithEmail(email.text, password.text);
+                          Get.to(() => ProfileSetup());
                         },
                       )))));
   }

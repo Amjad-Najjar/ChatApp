@@ -1,3 +1,4 @@
+import 'package:chatfirebase/model/USER.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'DataServer.dart';
@@ -21,10 +22,13 @@ class Auth extends GetxController {
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
       User user = result.user;
-           
       return user;
-    } catch (e) {
-      print(e.toString());
+    } catch ( error) {
+      if(error.code=="ERROR_EMAIL_ALREADY_IN_USE") 
+      try{
+        return await signInWithEmail(email, password);
+      }
+      catch(e){print(e.code);};
       return null;
     }
   }
@@ -42,8 +46,10 @@ class Auth extends GetxController {
   }
   Future updateUserProfile(String name ,String image ) async
   {
-   await _auth.currentUser.updateProfile(displayName: name ,photoURL: image);
-  data.addUserToDB(_auth.currentUser);
+    await _auth.currentUser.updateProfile(displayName: name ,photoURL: image);
+
+    await data.addUserToDB(_auth.currentUser);
+
   }
   Future signOut() async {
     try {

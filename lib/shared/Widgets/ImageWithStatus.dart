@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class ImageWithStatus extends StatelessWidget {
  final double radius;
- final File image;
+ final String image;
  //final Status state;
  ImageWithStatus({this.radius=35,this.image});
 
@@ -18,7 +18,7 @@ class ImageWithStatus extends StatelessWidget {
         children: [
           CircleAvatar(
             foregroundImage:image!=null?
-                Image.file(image, fit: BoxFit.cover).image:null,
+                Image.network(image, fit: BoxFit.cover).image:null,
             backgroundColor:Colors.white70,
             child: image==null?Center(child:Icon(Icons.person,size:this.radius ,)):null,
             radius: radius,

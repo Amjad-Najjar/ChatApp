@@ -1,12 +1,15 @@
 import 'dart:io';
 
+import 'package:chatfirebase/Services/auth.dart';
 import 'package:chatfirebase/model/USER.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:get/get.dart';
 
 
 class DataServer {
+  USER user;
   final users = FirebaseFirestore.instance.collection('users');
   Future<bool> newUser(User user) async {
     if (await users.doc().snapshots().length >0){    QuerySnapshot snapshot =
@@ -15,18 +18,30 @@ class DataServer {
     return u.length == 0 ? true : false;}
     else return true;
   }
-
-  Future addUserToDB(User user) async {
+ 
+  Future addUserToDB(USER user) async {
+    this.user=user;
     //if (await newUser(user)) {
-      await users.doc(user.uid).set({
-        "Name": user.displayName,
-        "Uid": user.uid,
-        "PhotoUrl":user.photoURL,
-        "LastSeen":DateTime.now().day.toString(),
+      await users.doc(user.id).set({
+        "Name": user.name,
+        "Uid": user.id,
+        "PhotoUrl":user.image,
+        "LastSeen":user.lastSeen,
 
       }
       );
+          print(user.name+" "+user.id);
+
    // }
+  }
+  Future sendMessage(USER peerUser)async{
+    var master =users.doc(user.id).collection("ChatRooms").doc(peerUser.id);
+    var slave =users.doc(peerUser.id).collection("ChatRooms").doc(user.id);
+    await master.collection("Messages").doc().set({"Name":peerUser.name,"Message":"Hello i am a master","Time":DateTime.now()});
+    await slave.collection("Messages").doc().set({"Name":user.name,"Message":"Hello i am a slave","Time":DateTime.now()});
+
+
+
   }
   Future<String> uploadImageToFirebase(File img) async {
     String fileName = "img"+DateTime.now().millisecondsSinceEpoch.toString();
@@ -51,7 +66,11 @@ class DataServer {
     return mylist;
   }
 
-  Future updateUser(String userId, Map m) async {
-    await users.where("Uid", isEqualTo: userId).snapshots().length;
+  Future<USER> updateUser(name,photoUrl,lastSeen)async{
+   DocumentReference doc =users.doc(user.id);
+  if(name!=null){user.name=name;await doc.update({"Name":name});}
+  if(photoUrl!=null){user.image=photoUrl;await doc.update({"PhotoUrl":photoUrl});}
+  if(lastSeen!=null){user.lastSeen=lastSeen;await doc.update({"LastSeen":lastSeen});}
+  return user;
   }
 }

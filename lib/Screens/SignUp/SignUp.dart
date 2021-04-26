@@ -38,7 +38,7 @@ class SignUp extends StatelessWidget {
                         
                         },
                         onSubmeted: () {
-                          if (email.text == "") email.text = "user6@user.com";
+                          if (email.text == "") email.text = "user7@user.com";
 
                           verfiyState.value = true;
                         },
@@ -51,7 +51,7 @@ class SignUp extends StatelessWidget {
                         },
                         onSubmeted: () async {
                           if (password.text == "")
-                            password.text = "user6@users";
+                            password.text = "user7@users";
 
                           print(email.text + " " + password.text);
                           await auth.signUpWithEmail(email.text, password.text);

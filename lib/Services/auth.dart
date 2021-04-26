@@ -5,7 +5,7 @@ import 'DataServer.dart';
 
 class Auth extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final DataServer data=Get.find<DataServer>();
+  DataServer data=DataServer();
   Rx<User> _firebaseUser  ;
   User get myStream => _firebaseUser.value;
   
@@ -13,6 +13,8 @@ class Auth extends GetxController {
   @override
   void onInit() {
     _firebaseUser=FirebaseAuth.instance.currentUser.obs;
+    
+    Get.put<DataServer>(data,permanent: true);
     // TODO: implement onInit
     _firebaseUser.bindStream(_auth.authStateChanges());
     super.onInit();
@@ -32,7 +34,10 @@ class Auth extends GetxController {
       return null;
     }
   }
-
+  USER getCurrentUser(){
+    User u= _auth.currentUser;
+    return USER( name:u.displayName,id:u.uid,image:u.photoURL);
+  }
   Future signInWithEmail(String email, String password) async {
     try {
       UserCredential result = await _auth.signInWithEmailAndPassword(
@@ -48,7 +53,8 @@ class Auth extends GetxController {
   {
     await _auth.currentUser.updateProfile(displayName: name ,photoURL: image);
 
-    await data.addUserToDB(_auth.currentUser);
+    await data.addUserToDB(getCurrentUser());
+    print(getCurrentUser().name+" "+getCurrentUser().id);
 
   }
   Future signOut() async {

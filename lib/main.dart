@@ -19,8 +19,11 @@ void main()async {
   await Firebase.initializeApp();
   runApp(GetMaterialApp(
      initialBinding: BindingsBuilder(()async{
+       Auth auth=Auth();
+      Get.put<Auth>(auth,permanent: true);
+
        Get.put<DataServer>(DataServer(),permanent: true);
-      Get.put<Auth>(Auth(),permanent: true);
+
      }),
     home:SignUp())
     );

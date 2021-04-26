@@ -1,7 +1,13 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:chatfirebase/shared/constant.dart';
 
 class SendingBox extends StatelessWidget {
+  final Function messageCallBack;
+  final Function onSendCallBack;
+  SendingBox({this.messageCallBack,this.onSendCallBack});
+
   @override
   Widget build(BuildContext context) {
     SizeConfig.init(context);
@@ -28,6 +34,7 @@ class SendingBox extends StatelessWidget {
             color: Colors.grey[300].withOpacity(0.2),
           ),
           child: TextField(
+            onChanged: messageCallBack,
               decoration: InputDecoration(
             border: InputBorder.none,
             suffixIcon: InkWell(
@@ -37,7 +44,7 @@ class SendingBox extends StatelessWidget {
         ),
         ElevatedButton(
           child: Center(child: Icon(Icons.send)),
-          onPressed: () {},
+          onPressed: onSendCallBack,
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(primaryColor),
               shape: MaterialStateProperty.all<CircleBorder>(

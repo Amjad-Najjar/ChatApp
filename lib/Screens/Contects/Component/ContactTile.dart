@@ -17,7 +17,7 @@ backgroundColor: Colors.grey.withOpacity(.9),
       title:Row(children: [SizedBox(width: SizeConfig.blockSizeHorizontal*8,),
       Text(user.name,style: TextStyle(fontSize: 20,color: Colors.grey,fontWeight:FontWeight.w600),),])
       ),
-      onTap: (){Get.to(()=>ChatRoom(user:user));},
+      onTap: (){Get.to(()=>ChatRoom(peerUser:user));},
     );
   }
 }

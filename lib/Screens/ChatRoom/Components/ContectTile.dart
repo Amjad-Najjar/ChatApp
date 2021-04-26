@@ -1,13 +1,12 @@
 import 'dart:io';
 
+import 'package:chatfirebase/model/USER.dart';
 import 'package:chatfirebase/shared/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:chatfirebase/shared/Widgets/ImageWithStatus.dart';
 class ContectTile extends StatelessWidget {
-  final String name;
-  final File image ;
-  final String lastSeen;
-  ContectTile({this.name,this.image,this.lastSeen});
+  final USER peerUser;
+  ContectTile({this.peerUser});
   @override
   Widget build(BuildContext context) {
     SizeConfig.init(context);
@@ -22,8 +21,8 @@ class ContectTile extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(name,style:TextStyle(fontSize: 20,color:Colors.grey,fontWeight: FontWeight.w800,letterSpacing: 1.1)),
-          Text(lastSeen,style:TextStyle(color: Colors.grey)),
+            Text(peerUser.name,style:TextStyle(fontSize: 20,color:Colors.grey,fontWeight: FontWeight.w800,letterSpacing: 1.1)),
+          Text("peerUser.lastSeen",style:TextStyle(color: Colors.grey)),
           ],
         ),
         Spacer(),
